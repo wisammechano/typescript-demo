@@ -1,9 +1,10 @@
-const express = require('express');
-const routes = express.Router();
-const authRoutes = require('./auth');
-const todosRoutes = require('./todos');
+import { Router } from 'express';
+import authRoutes from './auth';
+import todosRoutes from './todos';
+
+const routes = Router();
 
 routes.use('/auth', authRoutes);
 routes.use('/todos', todosRoutes);
 
-module.exports = routes;
+export default routes;

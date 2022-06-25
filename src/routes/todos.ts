@@ -1,6 +1,7 @@
-const express = require('express');
-const routes = express.Router();
-const Todo = require('../models/Todo');
+import { Router } from 'express';
+import Todo from '../models/Todo';
+
+const routes = Router();
 
 // GET /api/todos : Returns all TODOs
 routes.get('/', async (req, res) => {
@@ -13,7 +14,7 @@ routes.get('/', async (req, res) => {
 routes.put('/:id', async (req, res) => {
   const userId = req.auth.sub;
   const { done } = req.body;
-  const id = req.params.id;
+  const id: string = req.params.id;
 
   const todo = await Todo.findById(id);
 
@@ -31,7 +32,7 @@ routes.put('/:id', async (req, res) => {
 
   todo.done = done;
   await todo.save();
-  res.json(todo);
+  return res.json(todo);
 });
 
 // DELETE /api/todos/ID : Deletes a single TODO
@@ -54,7 +55,7 @@ routes.delete('/:id', async (req, res) => {
   }
 
   await Todo.findByIdAndDelete(id);
-  res.status(204).end();
+  return res.status(204).end();
 });
 
 // POST /api/todos : Create a new TODO
@@ -68,4 +69,4 @@ routes.post('/', async (req, res) => {
   res.status(201).json(todo);
 });
 
-module.exports = routes;
+export default routes;

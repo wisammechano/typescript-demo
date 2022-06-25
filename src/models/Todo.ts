@@ -1,6 +1,13 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const todoSchema = new mongoose.Schema({
+export interface ITodo {
+  text: string;
+  done: boolean;
+  createdAt: Date;
+  user: mongoose.Types.ObjectId;
+}
+
+const todoSchema = new mongoose.Schema<ITodo>({
   text: {
     type: String,
     required: true,
@@ -20,18 +27,15 @@ const todoSchema = new mongoose.Schema({
   },
 });
 
-const transform = function (doc, ret, options) {
-  if (options.hide) {
-    options.hide.split(' ').forEach(function (prop) {
-      delete ret[prop];
+const hider =
+  (props: string[]) => (doc: ITodo, ret: Partial<ITodo>, options: any) => {
+    props.forEach((prop: keyof ITodo) => {
+      if (ret.hasOwnProperty(prop)) delete ret[prop];
     });
-  }
-  return ret;
-};
+    return ret;
+  };
 
-todoSchema.set('toObject', { virtuals: true, transform });
-todoSchema.set('toJSON', { virtuals: true, transform });
-todoSchema.options.toJSON.hide = 'user';
-// todoSchema.options.toObject.hide = 'user';
+todoSchema.set('toObject', { virtuals: true, transform: hider(['user']) });
+todoSchema.set('toJSON', { virtuals: true, transform: hider(['user']) });
 
-module.exports = mongoose.model('Todo', todoSchema);
+export default mongoose.model<ITodo>('Todo', todoSchema);
