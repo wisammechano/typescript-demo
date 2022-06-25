@@ -1,13 +1,15 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const DB_URI = process.env.DB_URI;
+const DB_URI = process.env['DB_URI'];
 
 let uri = DB_URI;
 
-module.exports = {
+export default {
   DB_URI,
   connect: () => {
-    return mongoose.connect(uri).catch((err) => console.log(err));
+    if (!uri) throw new Error('DB_URI is not defined');
+
+    return mongoose.connect(uri).catch((err: any) => console.log(err));
   },
   closeDatabase: async (drop = false) => {
     drop && (await mongoose.connection.dropDatabase());
@@ -18,7 +20,7 @@ module.exports = {
   clearDatabase: async () => {
     const collections = mongoose.connection.collections;
     for (const key in collections) {
-      await collections[key].deleteMany();
+      await collections[key].deleteMany({});
     }
   },
 };
