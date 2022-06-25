@@ -1,10 +1,10 @@
-const express = require('express');
-const routes = express.Router();
-const passport = require('passport');
-const jwt = require('jsonwebtoken'); // A NodeJS module to implement JWTs
+import { Request, Response, Router } from 'express';
+import passport from 'passport';
+const routes = Router();
+import jwt from 'jsonwebtoken'; // A NodeJS module to implement JWTs
 
 // GET /api/auth/me : Returns authentication info or user profile info
-routes.get('/me', (req, res) => {
+routes.get('/me', (req: Request, res: Response) => {
   res.json(req.auth);
 });
 
@@ -21,10 +21,10 @@ routes.get(
   // In case of failed authentication, redirect to home page. This can also be an error page in some cases.
   // Also, disable PassportJS sessions since we want to use JWTs.
   passport.authenticate('google', { failureRedirect: '/', session: false }),
-  function (req, res) {
+  function (req: Request, res: Response) {
     // Fetch and configure user details required to create JWT
     const cookieAge = 14 * 24 * 3600; // 14 days converted to seconds
-    const { _id, name, email, providerId, profilePicture } = req.user;
+    const { _id, name, email, providerId, profilePicture } = req.user ?? {};
     const payload = {
       name,
       email,
@@ -33,9 +33,13 @@ routes.get(
     };
 
     // Create signed JWT using jsonwebtoken package
-    const token = jwt.sign(payload, process.env.SECRET_KEY, {
+    if (!process.env['SECRET_KEY']) {
+      throw new Error('App has no secret key');
+    }
+
+    const token = jwt.sign(payload, process.env['SECRET_KEY'], {
       expiresIn: cookieAge,
-      subject: _id.toString(),
+      subject: _id?.toString(),
     });
 
     // Set cookie with name '_t' and above signed JWT
@@ -57,4 +61,4 @@ routes.get('/logout', (req, res) => {
   res.status(200).json({ success: true });
 });
 
-module.exports = routes;
+export default routes;
