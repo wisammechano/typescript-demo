@@ -28,14 +28,18 @@ const todoSchema = new mongoose.Schema<ITodo>({
 });
 
 const hider =
-  (props: string[]) => (doc: ITodo, ret: Partial<ITodo>, options: any) => {
+  (props: (keyof ITodo)[]) =>
+  (doc: ITodo, ret: Partial<ITodo>, options: any) => {
     props.forEach((prop: keyof ITodo) => {
       if (ret.hasOwnProperty(prop)) delete ret[prop];
     });
     return ret;
   };
 
-todoSchema.set('toObject', { virtuals: true, transform: hider(['user']) });
+todoSchema.set('toObject', {
+  virtuals: true,
+  transform: hider(['user', 'user']),
+});
 todoSchema.set('toJSON', { virtuals: true, transform: hider(['user']) });
 
 export default mongoose.model<ITodo>('Todo', todoSchema);
