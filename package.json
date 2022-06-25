@@ -6,8 +6,10 @@
   "author": "Wisam Naji",
   "license": "MIT",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
+    "start": "node dist/app.js",
+    "dev": "nodemon src/app.ts",
+    "prestart": "yarn build",
+    "build": "tsc",
     "test": "jest --noStackTrace --forceExit --detectOpenHandles --roots=./src",
     "test:debug": "node --inspect-brk=0.0.0.0 node_modules/.bin/jest --runInBand --noStackTrace --forceExit --detectOpenHandles --roots=./src"
   },
